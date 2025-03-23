@@ -1,0 +1,16 @@
+# split file into 5 minutes long subfiles
+ffmpeg -i input.mp3 -f segment -segment_time 00:05:00 -c copy output%03d.mp3
+
+# Extract Audio
+ffmpeg -i input.mp4 -vn -c:a libmp3lame -b:a 192k output.mp3
+
+# Convert Video Format
+ffmpeg -i input.avi -c:v libx264 -c:a aac output.mp4
+
+# Concatenate multiple files into one
+ffmpeg -f concat -safe 0 -i list.txt -c copy output.mp3
+ffmpeg -i song_part1.mp3 -i song_part2.mp3 -filter_complex "[0:a][1:a]concat=n=2:v=0:a=1[outa]" -map "[outa]" combined_song.mp3
+
+# Get file duration
+ffprobe -v error -show_entries format=duration -of default=noprint_wrappers=1:nokey=1 input.mp4
+
